@@ -10,7 +10,7 @@
 #include "structs.h"
 
 /* 当前使用的数据结构类型 */
-static StructType current_type = USE_HASH;
+static StructType current_type = USE_HASH;  //默认哈希表 
 static LinkedList *g_list = NULL;
 static AVLTree *g_avl = NULL;
 static HashTable *g_hash = NULL;
@@ -134,7 +134,7 @@ void delete_expire_avl(ANode *node, int *deleted)
 }
 
 /* ============================================================
-   统一操作接口
+   统一操作接口 （在 utils.c 中，通过 current_type 变量决定使用哪种数据结构）任务1 
    ============================================================ */
 int insert_record(Record *r)
 {
@@ -336,4 +336,57 @@ int generate_data(const char *filename, int count)
     fclose(fp);
     printf("生成 %d 条数据到 %s（姓名均不重复）\n", count, filename);
     return count;
+}
+
+/* ============================================================
+   AVL树按姓名查找辅助 任务1
+   ============================================================ */
+void collect_avl_find_name(ANode *node, Record **arr, int *idx, const char *name)
+{
+    if (!node) return;
+    collect_avl_find_name(node->left, arr, idx, name);
+    if (strstr(node->data->name, name) != NULL) {
+        arr[(*idx)++] = node->data;
+    }
+    collect_avl_find_name(node->right, arr, idx, name);
+}
+
+/* ============================================================
+   AVL树按课程名称查找辅助 任务1
+   ============================================================ */
+void collect_avl_find_course(ANode *node, Record **arr, int *idx, const char *cname)
+{
+    if (!node) return;
+    collect_avl_find_course(node->left, arr, idx, cname);
+    if (strstr(node->data->course_name, cname) != NULL) {
+        arr[(*idx)++] = node->data;
+    }
+    collect_avl_find_course(node->right, arr, idx, cname);
+}
+
+/* ============================================================
+   AVL树高级筛选辅助 任务3
+   ============================================================ */
+void collect_avl_filter_adv(ANode *node, Record **arr, int *idx,
+                             const char *course_name, const char *semester,
+                             const char *college, int min, int max, int match_mode)
+{
+    if (!node) return;
+    collect_avl_filter_adv(node->left, arr, idx, course_name, semester, college, min, max, match_mode);
+
+    Record *r = node->data;
+    int match = 1;
+    if (strlen(course_name) > 0) {
+        if (match_mode == 0) {
+            if (strstr(r->course_name, course_name) == NULL) match = 0;
+        } else {
+            if (strcmp(r->course_name, course_name) != 0) match = 0;
+        }
+    }
+    if (strlen(semester) > 0 && strcmp(r->semester, semester) != 0) match = 0;
+    if (strlen(college) > 0 && strcmp(r->college, college) != 0) match = 0;
+    if (r->score < min || r->score > max) match = 0;
+    if (match) arr[(*idx)++] = r;
+
+    collect_avl_filter_adv(node->right, arr, idx, course_name, semester, college, min, max, match_mode);
 }

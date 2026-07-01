@@ -3,6 +3,8 @@
  * 定义选课记录、链表、AVL树、哈希表
  */
 
+//任务1：数据结构设计与基本操作
+
 #ifndef STRUCTS_H
 #define STRUCTS_H
 

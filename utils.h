@@ -31,6 +31,11 @@ HashTable* get_hash_instance(void);
 /* AVL树遍历辅助 */
 void collect_avl_all(ANode *node, Record **arr, int *idx);
 void collect_avl_filter(ANode *node, Record **arr, int *idx, int min, int max);
+void collect_avl_find_name(ANode *node, Record **arr, int *idx, const char *name);
+void collect_avl_find_course(ANode *node, Record **arr, int *idx, const char *cname);
+void collect_avl_filter_adv(ANode *node, Record **arr, int *idx,
+                             const char *course_name, const char *semester,
+                             const char *college, int min, int max, int match_mode);
 
 /* 统计和过期 */
 void stats_avl(ANode *node, int *sum, int *max, int *min,
